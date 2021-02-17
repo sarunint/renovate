@@ -31,7 +31,12 @@ import {
 } from '../../util/git';
 import { regEx } from '../../util/regex';
 import * as template from '../../util/template';
-import { BranchConfig, PrResult, ProcessBranchResult } from '../common';
+import {
+  BranchConfig,
+  PrResult,
+  ProcessBranchResult,
+  BranchUpgradeConfig,
+} from '../common';
 import { Limit, isLimitReached } from '../global/limits';
 import { checkAutoMerge, ensurePr, getPlatformPrOptions } from '../pr';
 import { tryBranchAutomerge } from './automerge';
@@ -339,7 +344,8 @@ export async function processBranch(
       getAdminConfig().trustLevel === 'high' &&
       is.nonEmptyArray(allowedPostUpgradeCommands)
     ) {
-      const executionMode = config.postUpgradeTasks.executionMode || 'dependency';
+      const executionMode =
+        config.postUpgradeTasks.executionMode || 'dependency';
 
       if (executionMode === 'branch') {
         logger.trace(
@@ -443,10 +449,14 @@ export async function processBranch(
         }
       }
 
+      const filteredUpgradeCommands: BranchUpgradeConfig[] = config.upgrades.filter(
+        ({ postUpgradeTasks }) =>
+          !postUpgradeTasks ||
+          !postUpgradeTasks.executionMode ||
+          postUpgradeTasks.executionMode !== 'branch'
+      );
 
-      const filteredUpgradeCommands = config.upgrades.filter(({ postUpgradeTasks }) => !postUpgradeTasks || !postUpgradeTasks.executionMode || postUpgradeTasks.executionMode !== 'branch')
-      
-      for (const upgrade in filteredUpgradeCommands) {
+      for (const upgrade of filteredUpgradeCommands) {
         addMeta({ dep: upgrade.depName });
         logger.trace(
           {
@@ -457,7 +467,7 @@ export async function processBranch(
         );
         const commands = upgrade.postUpgradeTasks.commands || [];
         const fileFilters = upgrade.postUpgradeTasks.fileFilters || [];
-        
+
         if (is.nonEmptyArray(commands)) {
           // Persist updated files in file system so any executed commands can see them
           for (const file of config.updatedPackageFiles.concat(
