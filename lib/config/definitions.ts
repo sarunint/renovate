@@ -116,6 +116,7 @@ const options: RenovateOptions[] = [
     default: {
       commands: [],
       fileFilters: [],
+      executionMode: 'dependency'
     },
   },
   {
@@ -136,6 +137,16 @@ const options: RenovateOptions[] = [
     subType: 'string',
     parent: 'postUpgradeTasks',
     default: [],
+    cli: false,
+  },
+  {
+    name: 'executionMode',
+    description:
+      'Controls whether the post upgrade tasks runs for every dependency or once per upgrade branch',
+    type: 'string',
+    parent: 'postUpgradeTasks',
+    allowedValues: ['dependency', 'branch'],
+    default: 'dependency',
     cli: false,
   },
   {
