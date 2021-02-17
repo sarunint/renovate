@@ -444,7 +444,9 @@ export async function processBranch(
       }
 
 
-      config.upgrades.filter(({ postUpgradeTasks }) => !postUpgradeTasks || !postUpgradeTasks.executionMode || postUpgradeTasks.executionMode !== 'branch').forEach(upgrade => {
+      const filteredUpgradeCommands = config.upgrades.filter(({ postUpgradeTasks }) => !postUpgradeTasks || !postUpgradeTasks.executionMode || postUpgradeTasks.executionMode !== 'branch')
+      
+      for (const upgrade in filteredUpgradeCommands) {
         addMeta({ dep: upgrade.depName });
         logger.trace(
           {
@@ -551,7 +553,7 @@ export async function processBranch(
             }
           }
         }
-      });
+      }
     }
     removeMeta(['dep']);
 
