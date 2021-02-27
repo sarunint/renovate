@@ -33,9 +33,9 @@ import { regEx } from '../../util/regex';
 import * as template from '../../util/template';
 import {
   BranchConfig,
+  BranchUpgradeConfig,
   PrResult,
   ProcessBranchResult,
-  BranchUpgradeConfig,
 } from '../common';
 import { Limit, isLimitReached } from '../global/limits';
 import { checkAutoMerge, ensurePr, getPlatformPrOptions } from '../pr';
